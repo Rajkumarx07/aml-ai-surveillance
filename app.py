@@ -116,7 +116,6 @@ uploaded_file = st.sidebar.file_uploader(
 if uploaded_file is None:
 
     st.markdown("""
-
     <div class="login-container">
 
         <div class="login-card">
@@ -126,17 +125,20 @@ if uploaded_file is None:
             </div>
 
             <div class="login-subtitle">
-                AI-Powered Compliance Intelligence System
+            AI-Powered Compliance Intelligence System
             </div>
 
-            <div style="color:#00E5FF;font-size:18px;">
+            <div style="
+                color:#00E5FF;
+                font-size:18px;
+                margin-top:20px;
+            ">
                 Upload AML transaction dataset from the sidebar to begin investigation workflow.
             </div>
 
         </div>
 
     </div>
-
     """, unsafe_allow_html=True)
 
     st.stop()
