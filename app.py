@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
+
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
@@ -17,39 +18,44 @@ st.markdown("""
 <style>
 
 .main {
-    background: linear-gradient(135deg,#071028,#0B1736,#071028);
-    color:white;
+    background: linear-gradient(
+        135deg,
+        #071028,
+        #0B1736,
+        #071028
+    );
+    color: white;
 }
 
-section[data-testid="stSidebar"]{
-    background-color:#081120;
+section[data-testid="stSidebar"] {
+    background-color: #081120;
 }
 
-[data-testid="stMetricValue"]{
-    color:#00E5FF;
-    font-size:34px;
+[data-testid="stMetricValue"] {
+    color: #00E5FF;
+    font-size: 34px;
 }
 
-[data-testid="stMetricLabel"]{
-    color:white;
+[data-testid="stMetricLabel"] {
+    color: white;
 }
 
-.stMetric{
-    background:rgba(255,255,255,0.05);
-    border:1px solid rgba(255,255,255,0.08);
-    padding:18px;
-    border-radius:18px;
-    backdrop-filter:blur(12px);
+.stMetric {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 18px;
+    border-radius: 18px;
+    backdrop-filter: blur(12px);
 }
 
-div[data-testid="stDataFrame"]{
-    background:rgba(255,255,255,0.03);
-    border-radius:16px;
-    padding:10px;
+div[data-testid="stDataFrame"] {
+    background: rgba(255,255,255,0.03);
+    border-radius: 16px;
+    padding: 10px;
 }
 
-.block-container{
-    padding-top:1rem;
+.block-container {
+    padding-top: 1rem;
 }
 
 </style>
@@ -167,11 +173,11 @@ model.fit(X_train, y_train)
 
 predictions = model.predict_proba(X)[:,1]
 
-noise = np.random.normal(0,0.08,len(predictions))
+noise = np.random.normal(0, 0.08, len(predictions))
 
 predictions = predictions + noise
 
-predictions = np.clip(predictions,0.02,0.98)
+predictions = np.clip(predictions, 0.02, 0.98)
 
 df["ai_suspicion_probability"] = predictions
 
@@ -288,13 +294,13 @@ if page == "Executive Overview":
         ]
     )
 
-    c1,c2,c3,c4,c5 = st.columns(5)
+    c1, c2, c3, c4, c5 = st.columns(5)
 
-    c1.metric("Critical Alerts",critical_alerts)
-    c2.metric("High Risk Alerts",high_alerts)
-    c3.metric("Medium Alerts",medium_alerts)
-    c4.metric("Average Risk %",avg_risk)
-    c5.metric("Linked Groups",suspicious_groups)
+    c1.metric("Critical Alerts", critical_alerts)
+    c2.metric("High Risk Alerts", high_alerts)
+    c3.metric("Medium Alerts", medium_alerts)
+    c4.metric("Average Risk %", avg_risk)
+    c5.metric("Linked Groups", suspicious_groups)
 
     st.markdown("---")
 
@@ -315,7 +321,7 @@ if page == "Executive Overview":
 
     st.markdown("---")
 
-    col1,col2 = st.columns(2)
+    col1, col2 = st.columns(2)
 
     with col1:
 
@@ -357,7 +363,7 @@ if page == "Executive Overview":
     with col2:
 
         sample_df = filtered_df.sample(
-            min(1200,len(filtered_df))
+            min(1200, len(filtered_df))
         )
 
         fig2 = px.scatter(
@@ -395,14 +401,14 @@ if page == "Executive Overview":
 
     st.markdown("---")
 
-city_risk = filtered_df.groupby(
-    original_df["address"]
+    city_risk = filtered_df.groupby(
+        original_df["address"]
     )["ai_suspicion_probability"].mean().reset_index()
 
-city_risk.columns = [
-    "address",
-    "risk"
-]
+    city_risk.columns = [
+        "address",
+        "risk"
+    ]
 
     fig3 = px.bar(
 
@@ -490,7 +496,7 @@ elif page == "Alert Intelligence":
     st.markdown("---")
 
     heatmap_df = filtered_df.sample(
-        min(1000,len(filtered_df))
+        min(1000, len(filtered_df))
     )
 
     fig4 = px.density_heatmap(
@@ -575,7 +581,7 @@ elif page == "Relationship Intelligence":
         filtered_df["group_id"] == selected_data["group_id"]
     ]
 
-    c6,c7,c8 = st.columns(3)
+    c6, c7, c8 = st.columns(3)
 
     c6.metric(
         "Linked Mobile Accounts",
@@ -622,6 +628,26 @@ elif page == "Relationship Intelligence":
             "client_id",
             "alert_priority",
             "ai_suspicion_probability",
+            "alert_reason"
+
+        ]],
+
+        use_container_width=True
+
+    )
+
+    st.markdown("---")
+
+    st.subheader("👥 Group Linked Entities")
+
+    st.dataframe(
+
+        linked_group[[
+
+            "client_id",
+            "alert_priority",
+            "monthly_turnover",
+            "fund_transfer_count",
             "alert_reason"
 
         ]],
