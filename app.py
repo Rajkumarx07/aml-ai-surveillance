@@ -117,24 +117,62 @@ if uploaded_file is None:
 
     st.markdown(
         """
-        <div class="login-container">
+        <style>
 
-            <div class="login-card">
+        .center-wrapper{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:80vh;
+        }
 
-                <div class="login-title">
+        .aml-card{
+            width:550px;
+            padding:50px;
+            border-radius:25px;
+            background:rgba(255,255,255,0.05);
+            border:1px solid rgba(255,255,255,0.08);
+            backdrop-filter:blur(15px);
+            text-align:center;
+            box-shadow:0px 0px 40px rgba(0,0,0,0.5);
+        }
+
+        .aml-title{
+            font-size:42px;
+            color:white;
+            font-weight:bold;
+            margin-bottom:10px;
+        }
+
+        .aml-subtitle{
+            color:#A0AEC0;
+            font-size:18px;
+            margin-bottom:25px;
+        }
+
+        .aml-text{
+            color:#00E5FF;
+            font-size:18px;
+            line-height:1.6;
+        }
+
+        </style>
+
+        <div class="center-wrapper">
+
+            <div class="aml-card">
+
+                <div class="aml-title">
                     🛡️ AML Surveillance Platform
                 </div>
 
-                <div class="login-subtitle">
+                <div class="aml-subtitle">
                     AI-Powered Compliance Intelligence System
                 </div>
 
-                <div style="
-                    color:#00E5FF;
-                    font-size:18px;
-                    margin-top:20px;
-                ">
-                    Upload AML transaction dataset from the sidebar to begin investigation workflow.
+                <div class="aml-text">
+                    Upload AML transaction dataset from the sidebar
+                    to begin intelligent investigation workflow.
                 </div>
 
             </div>
@@ -146,11 +184,9 @@ if uploaded_file is None:
 
     st.stop()
 
-else:
+df = pd.read_csv(uploaded_file)
 
-    df = pd.read_csv(uploaded_file)
-
-    st.sidebar.success("Dataset uploaded successfully")
+st.sidebar.success("Dataset uploaded successfully")
 
 original_df = df.copy()
 
