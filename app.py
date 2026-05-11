@@ -395,15 +395,14 @@ if page == "Executive Overview":
 
     st.markdown("---")
 
-    city_risk = original_df.copy()
+city_risk = filtered_df.groupby(
+    original_df["address"]
+    )["ai_suspicion_probability"].mean().reset_index()
 
-    city_risk["risk"] = filtered_df[
-        "ai_suspicion_probability"
-    ].values
-
-    city_risk = city_risk.groupby(
-        "address"
-    )["risk"].mean().reset_index()
+city_risk.columns = [
+    "address",
+    "risk"
+]
 
     fig3 = px.bar(
 
