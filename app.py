@@ -800,3 +800,24 @@ Enterprise AML Compliance Prototype
 </div>
 
 """, unsafe_allow_html=True)
+st.markdown("""
+<style>
+
+#MainMenu {
+    visibility: hidden;
+}
+
+header {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
+
+[data-testid="stToolbar"] {
+    display: none;
+}
+
+</style>
+""", unsafe_allow_html=True)
