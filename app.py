@@ -17,6 +17,22 @@ st.set_page_config(
 st.markdown("""
 <style>
 
+#MainMenu {
+    visibility: hidden;
+}
+
+header {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
+
+[data-testid="stToolbar"] {
+    display: none;
+}
+
 .main {
     background: linear-gradient(
         135deg,
@@ -58,10 +74,78 @@ div[data-testid="stDataFrame"] {
     padding-top: 1rem;
 }
 
+.login-container {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:80vh;
+}
+
+.login-card {
+    background: rgba(255,255,255,0.05);
+    padding: 50px;
+    border-radius: 24px;
+    width: 500px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(14px);
+    box-shadow: 0px 0px 40px rgba(0,0,0,0.4);
+}
+
+.login-title {
+    color:white;
+    font-size:40px;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+
+.login-subtitle {
+    color:#A0AEC0;
+    font-size:18px;
+    margin-bottom:25px;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
-df = pd.read_csv("aml_transactions_dataset.csv")
+uploaded_file = st.sidebar.file_uploader(
+    "Upload AML Transaction CSV",
+    type=["csv"]
+)
+
+if uploaded_file is None:
+
+    st.markdown("""
+
+    <div class="login-container">
+
+        <div class="login-card">
+
+            <div class="login-title">
+                🛡️ AML Surveillance Platform
+            </div>
+
+            <div class="login-subtitle">
+                AI-Powered Compliance Intelligence System
+            </div>
+
+            <div style="color:#00E5FF;font-size:18px;">
+                Upload AML transaction dataset from the sidebar to begin investigation workflow.
+            </div>
+
+        </div>
+
+    </div>
+
+    """, unsafe_allow_html=True)
+
+    st.stop()
+
+else:
+
+    df = pd.read_csv(uploaded_file)
+
+    st.sidebar.success("Dataset uploaded successfully")
 
 original_df = df.copy()
 
@@ -255,11 +339,47 @@ filtered_df = df[
     df["alert_priority"].isin(risk_filter)
 ]
 
+st.sidebar.markdown("---")
+
+st.sidebar.markdown("### Dataset Information")
+
+st.sidebar.write(f"Rows: {len(df)}")
+
+st.sidebar.write(f"Columns: {len(df.columns)}")
+
+st.sidebar.write(f"Groups: {df['group_id'].nunique()}")
+
 st.title("🛡️ AI AML Surveillance Platform")
 
 st.markdown("""
 Intelligent Alert Prioritization • Relationship Intelligence • Group Risk Detection
 """)
+
+st.markdown("---")
+
+st.subheader("📂 Active Dataset Intelligence")
+
+c0, c1, c2, c3 = st.columns(4)
+
+c0.metric(
+    "Total Records",
+    len(df)
+)
+
+c1.metric(
+    "Unique Clients",
+    df["client_id"].nunique()
+)
+
+c2.metric(
+    "Unique Groups",
+    df["group_id"].nunique()
+)
+
+c3.metric(
+    "Suspicious Labels",
+    df["suspicious_flag"].sum()
+)
 
 st.markdown("---")
 
@@ -304,102 +424,77 @@ if page == "Executive Overview":
 
     st.markdown("---")
 
-    st.subheader("🧠 Executive Intelligence Summary")
+    risk_dist = filtered_df.groupby(
+        "alert_priority"
+    ).size().reset_index(name="count")
 
-    st.info(f"""
+    fig1 = px.bar(
 
-    • AI engine identified {critical_alerts} critical entities.
+        risk_dist,
 
-    • Average suspicious probability:
-      {avg_risk}%
+        x="alert_priority",
 
-    • Relationship intelligence detected elevated linked-account activity.
+        y="count",
 
-    • Enhanced Due Diligence recommended for flagged entities.
+        color="alert_priority",
 
-    """)
+        text="count"
 
-    st.markdown("---")
+    )
 
-    col1, col2 = st.columns(2)
+    fig1.update_layout(
 
-    with col1:
+        paper_bgcolor="#071028",
 
-        risk_dist = filtered_df.groupby(
-            "alert_priority"
-        ).size().reset_index(name="count")
+        plot_bgcolor="#071028",
 
-        fig1 = px.bar(
+        font_color="white",
 
-            risk_dist,
+        title="Alert Severity Distribution"
 
-            x="alert_priority",
+    )
 
-            y="count",
+    st.plotly_chart(
+        fig1,
+        use_container_width=True
+    )
 
-            color="alert_priority",
+    sample_df = filtered_df.sample(
+        min(1200, len(filtered_df))
+    )
 
-            text="count"
+    fig2 = px.scatter(
 
-        )
+        sample_df,
 
-        fig1.update_layout(
+        x="monthly_turnover",
 
-            paper_bgcolor="#071028",
+        y="ai_suspicion_probability",
 
-            plot_bgcolor="#071028",
+        color="alert_priority",
 
-            font_color="white",
+        size="fund_transfer_count",
 
-            title="Alert Severity Distribution"
+        hover_data=["client_id"]
 
-        )
+    )
 
-        st.plotly_chart(
-            fig1,
-            use_container_width=True
-        )
+    fig2.update_layout(
 
-    with col2:
+        paper_bgcolor="#071028",
 
-        sample_df = filtered_df.sample(
-            min(1200, len(filtered_df))
-        )
+        plot_bgcolor="#071028",
 
-        fig2 = px.scatter(
+        font_color="white",
 
-            sample_df,
+        title="Turnover vs Suspicion Intelligence"
 
-            x="monthly_turnover",
+    )
 
-            y="ai_suspicion_probability",
-
-            color="alert_priority",
-
-            size="fund_transfer_count",
-
-            hover_data=["client_id"]
-
-        )
-
-        fig2.update_layout(
-
-            paper_bgcolor="#071028",
-
-            plot_bgcolor="#071028",
-
-            font_color="white",
-
-            title="Turnover vs Suspicion Intelligence"
-
-        )
-
-        st.plotly_chart(
-            fig2,
-            use_container_width=True
-        )
-
-    st.markdown("---")
+    st.plotly_chart(
+        fig2,
+        use_container_width=True
+    )
 
     city_risk = filtered_df.groupby(
         original_df["address"]
@@ -439,31 +534,6 @@ if page == "Executive Overview":
         use_container_width=True
     )
 
-    st.markdown("---")
-
-    investigation_table = filtered_df[[
-
-        "client_id",
-        "aml_risk_score",
-        "ai_suspicion_probability",
-        "alert_priority",
-        "alert_reason"
-
-    ]]
-
-    investigation_table = investigation_table.sort_values(
-
-        by="ai_suspicion_probability",
-
-        ascending=False
-
-    )
-
-    st.dataframe(
-        investigation_table.head(100),
-        use_container_width=True
-    )
-
 elif page == "Alert Intelligence":
 
     st.subheader("🚨 AI Alert Intelligence")
@@ -492,8 +562,6 @@ elif page == "Alert Intelligence":
         alert_df.head(200),
         use_container_width=True
     )
-
-    st.markdown("---")
 
     heatmap_df = filtered_df.sample(
         min(1000, len(filtered_df))
@@ -525,31 +593,6 @@ elif page == "Alert Intelligence":
 
     st.plotly_chart(
         fig4,
-        use_container_width=True
-    )
-
-    st.markdown("---")
-
-    fig5 = px.sunburst(
-
-        filtered_df,
-
-        path=["alert_priority"],
-
-        values="monthly_turnover"
-
-    )
-
-    fig5.update_layout(
-
-        paper_bgcolor="#071028",
-
-        font_color="white"
-
-    )
-
-    st.plotly_chart(
-        fig5,
         use_container_width=True
     )
 
@@ -598,8 +641,6 @@ elif page == "Relationship Intelligence":
         len(linked_group)
     )
 
-    st.markdown("---")
-
     st.subheader("📱 Mobile Linked Entities")
 
     st.dataframe(
@@ -617,8 +658,6 @@ elif page == "Relationship Intelligence":
 
     )
 
-    st.markdown("---")
-
     st.subheader("🌐 IP Linked Entities")
 
     st.dataframe(
@@ -635,8 +674,6 @@ elif page == "Relationship Intelligence":
         use_container_width=True
 
     )
-
-    st.markdown("---")
 
     st.subheader("👥 Group Linked Entities")
 
@@ -679,20 +716,10 @@ elif page == "Suspicious Cluster Explorer":
 
     ]
 
-    cluster_df = cluster_df.sort_values(
-
-        by="avg_probability",
-
-        ascending=False
-
-    )
-
     st.dataframe(
         cluster_df.head(100),
         use_container_width=True
     )
-
-    st.markdown("---")
 
     fig6 = px.scatter(
 
@@ -757,8 +784,6 @@ elif page == "Compliance Report":
         use_container_width=True
     )
 
-    st.markdown("---")
-
     csv = report_df.to_csv(index=False)
 
     st.download_button(
@@ -799,14 +824,4 @@ Enterprise AML Compliance Prototype
 
 </div>
 
-""", unsafe_allow_html=True)
-
-st.markdown("""
-<style>
-
-iframe {
-    display: none !important;
-}
-
-</style>
 """, unsafe_allow_html=True)
